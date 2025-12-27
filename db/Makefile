@@ -1,8 +1,8 @@
 .PHONY: help start stop connect init
 
 # Database connection commands
-PSQL_ADMIN := docker compose exec -T postgres psql -U intern -d postgres
-PSQL_DB := docker compose exec -T postgres psql -U intern -d treasure_app_2025_test
+PSQL_ADMIN := docker compose exec -T postgres psql -U integral -d postgres
+PSQL_DB := docker compose exec -T postgres psql -U integral -d logit_test
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -14,7 +14,7 @@ start: ## Start PostgreSQL container for testing
 		echo "Waiting for PostgreSQL to be ready..."; \
 		TIMEOUT=30; \
 		COUNTER=0; \
-		while ! docker compose exec -T postgres pg_isready -U intern > /dev/null 2>&1; do \
+		while ! docker compose exec -T postgres pg_isready -U integral > /dev/null 2>&1; do \
 			sleep 1; \
 			echo -n "."; \
 			COUNTER=$$((COUNTER + 1)); \
@@ -33,14 +33,14 @@ stop: ## Stop PostgreSQL container
 	docker compose down
 
 connect: ## Connect to PostgreSQL with psql
-	docker compose exec postgres psql -U intern -d treasure_app_2025_test
+	docker compose exec postgres psql -U integral -d logit_test
 
 init: ## Initialize database (drop and recreate with migrations and seed data)
 	@echo "Initializing database..."; \
 	echo "Dropping existing database..."; \
-	$(PSQL_ADMIN) -c "DROP DATABASE IF EXISTS treasure_app_2025_test;"; \
+	$(PSQL_ADMIN) -c "DROP DATABASE IF EXISTS logit_test;"; \
 	echo "Creating new database..."; \
-	$(PSQL_ADMIN) -c "CREATE DATABASE treasure_app_2025_test;"; \
+	$(PSQL_ADMIN) -c "CREATE DATABASE logit_test;"; \
 	echo "Running migrations..."; \
 	for file in migration/*.sql; do \
 		echo "Applying $$file..."; \
